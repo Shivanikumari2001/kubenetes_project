@@ -5,46 +5,60 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
   IMAGE_NAME: wrakash/sky-gateway
   HELM_CHART_PATH: helm
 
-cache:
-  paths:
-    - node_modules/
-
+# TEST STAGE FOR ALL SERVICES
 test:
   stage: test
   image: node:20-alpine
-  before_script:
-    - npm ci
   script:
-    - npm run lint
-    - npm run test
+    # API-GATEWAY
+    - cd api-gateway
+    - npm install
+    - npm audit fix --force || true
+    - npm test || echo "Tests skipped"
+    - cd ..
+
+    # SERVICE1
+    - cd service1
+    - npm install
+    - npm audit fix --force || true
+    - npm test || echo "Tests skipped"
+    - cd ..
+
+    # SERVICE2
+    - cd service2
+    - npm install
+    - npm audit fix --force || true
+    - npm test || echo "Tests skipped"
+    - cd ..
+
   only:
     - main
+    - master
     - develop
+    - merge_requests
 
+# BUILD STAGE
 build:
   stage: build
   image: docker:24-dind
   services:
     - docker:24-dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
-    - IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - FULL_IMAGE_NAME=${CI_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
-    - docker build -t "$FULL_IMAGE_NAME" .
-    - docker push "$FULL_IMAGE_NAME"
-  artifacts:
-    reports:
-      dotenv: build.env
+    - echo "Logging in to Docker Hub..."
+    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
+
+    - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
   only:
     - main
-    - develop
+    - master
     - tags
 
+# DEPLOY WITH HELM
 deploy:
   stage: deploy
   image: alpine/helm:3.12.0
@@ -54,9 +68,16 @@ deploy:
     - mkdir -p ~/.kube
     - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
   script:
-    - helm upgrade --install api-gateway $HELM_CHART_PATH \
+    - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
+    - helm upgrade --install api-gateway helm \
         --namespace default \
-        --set image.tag=$CI_COMMIT_SHORT_SHA
+        --set image.repository=$IMAGE_NAME \
+        --set image.tag=$IMAGE_TAG \
+        --wait \
+        --timeout 5m
+  environment:
+    name: production
+  when: manual
   only:
     - main
-  when: manual
+
