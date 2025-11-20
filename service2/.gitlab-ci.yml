@@ -20,9 +20,22 @@ test:
   image: node:20-alpine
   before_script:
     - apk add --no-cache openssl
+    - |
+      if [ -f "package.json" ]; then
+        echo "Already in service2 directory"
+      elif [ -d "service2" ]; then
+        cd service2
+      else
+        echo "Error: Cannot find service2 directory or package.json"
+        exit 1
+      fi
     - npm ci
     - npx prisma generate
   script:
+    - |
+      if [ ! -f "package.json" ]; then
+        cd service2 || exit 1
+      fi
     - npm run lint
     - npm run test
   only:
@@ -51,6 +64,10 @@ build:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
     - export FULL_IMAGE_NAME=${IMAGE_REGISTRY}${IMAGE_NAME}:${IMAGE_TAG}
     - echo "Building Docker image: $FULL_IMAGE_NAME"
+    - |
+      if [ ! -f "Dockerfile" ]; then
+        cd service2 || exit 1
+      fi
     - docker build -t $FULL_IMAGE_NAME .
     - docker tag $FULL_IMAGE_NAME ${IMAGE_REGISTRY}${IMAGE_NAME}:latest
     - docker push $FULL_IMAGE_NAME
