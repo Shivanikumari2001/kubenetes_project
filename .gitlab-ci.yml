@@ -38,7 +38,6 @@ api-gateway:build:
   before_script:
     - cd api-gateway
     - |
-      # Try to login to Docker Hub if credentials are provided
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
         echo "Logging in to Docker Hub..."
         docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
@@ -55,15 +54,7 @@ api-gateway:build:
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      # Only push if we have credentials
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
@@ -115,14 +106,7 @@ service1:build:
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
@@ -174,14 +158,7 @@ service2:build:
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
