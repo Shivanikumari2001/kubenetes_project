@@ -1,9 +1,12 @@
 replicaCount: 1
 
 image:
-  repository: wrakash/sky-service2
-  pullPolicy: IfNotPresent
-  tag: "1.0.1"
+  # repository: wrakash/sky-service2
+  # pullPolicy: IfNotPresent
+  # tag: "1.0.1"
+  repository: service2
+  tag: "latest"
+  pullPolicy: Never
 
 imagePullSecrets: []
 nameOverride: "service2"
