@@ -6,7 +6,6 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
 
-# Simple test job to verify pipeline works
 test-simple:
   stage: test
   image: alpine:latest
@@ -14,99 +13,66 @@ test-simple:
     - echo "Pipeline is working!"
     - echo "Testing GitLab CI/CD"
 
-# API Gateway Build
-api-gateway:build:
+api-gateway-build:
   stage: build
   image: docker:24-dind
   services:
     - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-gateway
   before_script:
     - cd api-gateway
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
-      else
-        echo "WARNING: No Docker credentials found."
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - export IMAGE_NAME=wrakash/sky-gateway
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
     - develop
     - tags
 
-# Service1 Build
-service1:build:
+service1-build:
   stage: build
   image: docker:24-dind
   services:
     - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-service1
   before_script:
     - cd service1
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
-      else
-        echo "WARNING: No Docker credentials found."
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - export IMAGE_NAME=wrakash/sky-service1
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
     - develop
     - tags
 
-# Service2 Build
-service2:build:
+service2-build:
   stage: build
   image: docker:24-dind
   services:
     - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-service2
   before_script:
     - cd service2
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
-      else
-        echo "WARNING: No Docker credentials found."
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - export IMAGE_NAME=wrakash/sky-service2
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - |
-      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-        docker push ${IMAGE_NAME}:latest || echo "Push failed"
-      else
-        echo "Skipping push - no credentials available"
-      fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
   only:
     - main
     - master
