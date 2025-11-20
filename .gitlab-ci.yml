@@ -21,15 +21,26 @@ api-gateway-build:
   variables:
     IMAGE_NAME: wrakash/sky-gateway
   before_script:
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-    - cd api-gateway
-    - ls -la
-    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-    - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
+    - |
+      cd api-gateway || exit 1
+      pwd
+      ls -la
+      if [ ! -f "Dockerfile" ]; then
+        echo "ERROR: Dockerfile not found in api-gateway directory"
+        exit 1
+      fi
+      docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+      docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
+        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
+        docker push ${IMAGE_NAME}:latest || echo "Push failed"
+      else
+        echo "Skipping push - no credentials available"
+      fi
   only:
     - main
     - master
@@ -44,15 +55,26 @@ service1-build:
   variables:
     IMAGE_NAME: wrakash/sky-service1
   before_script:
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-    - cd service1
-    - ls -la
-    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-    - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
+    - |
+      cd service1 || exit 1
+      pwd
+      ls -la
+      if [ ! -f "Dockerfile" ]; then
+        echo "ERROR: Dockerfile not found in service1 directory"
+        exit 1
+      fi
+      docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+      docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
+        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
+        docker push ${IMAGE_NAME}:latest || echo "Push failed"
+      else
+        echo "Skipping push - no credentials available"
+      fi
   only:
     - main
     - master
@@ -67,15 +89,26 @@ service2-build:
   variables:
     IMAGE_NAME: wrakash/sky-service2
   before_script:
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
+    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-    - cd service2
-    - ls -la
-    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-    - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-    - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"; docker push ${IMAGE_NAME}:latest || echo "Push failed"; else echo "Skipping push - no credentials available"; fi
+    - |
+      cd service2 || exit 1
+      pwd
+      ls -la
+      if [ ! -f "Dockerfile" ]; then
+        echo "ERROR: Dockerfile not found in service2 directory"
+        exit 1
+      fi
+      docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+      docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+      if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
+        docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
+        docker push ${IMAGE_NAME}:latest || echo "Push failed"
+      else
+        echo "Skipping push - no credentials available"
+      fi
   only:
     - main
     - master
