@@ -5,8 +5,8 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  IMAGE_NAME: wrakash/sky-gateway
-  HELM_CHART_PATH: helm
+  IMAGE_NAME: shivani0320/sky-gateway   # <-- apna Docker Hub username lagao
+  HELM_CHART_PATH: api-gateway/helm     # <-- agar Helm chart api-gateway ke andar hai
 
 # Test all services
 test:
@@ -22,7 +22,7 @@ test:
     - develop
     - merge_requests
 
-# Build Docker Image
+# Build Docker Image (only API-Gateway)
 build:
   stage: build
   image: docker:24-dind
@@ -31,7 +31,7 @@ build:
   script:
     - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG ./api-gateway   # <-- correct path
     - docker push $IMAGE_NAME:$IMAGE_TAG
   only:
     - main
@@ -49,7 +49,7 @@ deploy:
     - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-    - helm upgrade --install api-gateway helm \
+    - helm upgrade --install api-gateway ./api-gateway/helm \   # <-- correct path
         --namespace default \
         --set image.repository=$IMAGE_NAME \
         --set image.tag=$IMAGE_TAG \
