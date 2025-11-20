@@ -13,26 +13,9 @@ test:
   stage: test
   image: node:20-alpine
   script:
-    # --- API-GATEWAY ---
-    - cd api-gateway
-    - npm install
-    - npm audit fix --force || true
-    - npm test || echo "No tests or skipped"
-    - cd ..
-
-    # --- SERVICE1 ---
-    - cd service1
-    - npm install
-    - npm audit fix --force || true
-    - npm test || echo "No tests or skipped"
-    - cd ..
-
-    # --- SERVICE2 ---
-    - cd service2
-    - npm install
-    - npm audit fix --force || true
-    - npm test || echo "No tests or skipped"
-    - cd ..
+    - cd api-gateway && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
+    - cd service1 && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
+    - cd service2 && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
   only:
     - main
     - master
@@ -46,7 +29,7 @@ build:
   services:
     - docker:24-dind
   script:
-    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
+    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
@@ -77,3 +60,4 @@ deploy:
   when: manual
   only:
     - main
+
