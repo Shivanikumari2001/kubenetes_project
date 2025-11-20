@@ -9,7 +9,7 @@ variables:
   IMAGE_NAME: wrakash/sky-gateway
   HELM_CHART_PATH: helm
 
-# Cache node_modules for faster builds
+# Cach node_modules for faster builds
 cache:
   paths:
     - node_modules/
