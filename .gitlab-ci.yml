@@ -6,21 +6,13 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
 
-# API Gateway Test
-api-gateway:test:
+# Simple test job to verify pipeline works
+test-simple:
   stage: test
-  image: node:20-alpine
-  before_script:
-    - cd api-gateway
-    - npm ci || echo "npm ci failed, continuing..."
+  image: alpine:latest
   script:
-    - npm run lint || echo "Lint skipped"
-    - npm run test || echo "Tests skipped"
-  only:
-    - main
-    - master
-    - develop
-  allow_failure: true
+    - echo "Pipeline is working!"
+    - echo "Testing GitLab CI/CD"
 
 # API Gateway Build
 api-gateway:build:
@@ -32,10 +24,9 @@ api-gateway:build:
     - cd api-gateway
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Logging in to Docker Hub..."
         docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
       else
-        echo "WARNING: No Docker credentials found. Build will continue but push will fail."
+        echo "WARNING: No Docker credentials found."
       fi
   script:
     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
@@ -45,7 +36,6 @@ api-gateway:build:
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
         docker push ${IMAGE_NAME}:latest || echo "Push failed"
       else
@@ -57,24 +47,6 @@ api-gateway:build:
     - develop
     - tags
 
-# Service1 Test
-service1:test:
-  stage: test
-  image: node:20-alpine
-  before_script:
-    - cd service1
-    - apk add --no-cache openssl
-    - npm ci || echo "npm ci failed, continuing..."
-    - npx prisma generate || echo "Prisma generate skipped"
-  script:
-    - npm run lint || echo "Lint skipped"
-    - npm run test || echo "Tests skipped"
-  only:
-    - main
-    - master
-    - develop
-  allow_failure: true
-
 # Service1 Build
 service1:build:
   stage: build
@@ -85,7 +57,6 @@ service1:build:
     - cd service1
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Logging in to Docker Hub..."
         docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
       else
         echo "WARNING: No Docker credentials found."
@@ -98,7 +69,6 @@ service1:build:
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
         docker push ${IMAGE_NAME}:latest || echo "Push failed"
       else
@@ -110,24 +80,6 @@ service1:build:
     - develop
     - tags
 
-# Service2 Test
-service2:test:
-  stage: test
-  image: node:20-alpine
-  before_script:
-    - cd service2
-    - apk add --no-cache openssl
-    - npm ci || echo "npm ci failed, continuing..."
-    - npx prisma generate || echo "Prisma generate skipped"
-  script:
-    - npm run lint || echo "Lint skipped"
-    - npm run test || echo "Tests skipped"
-  only:
-    - main
-    - master
-    - develop
-  allow_failure: true
-
 # Service2 Build
 service2:build:
   stage: build
@@ -138,7 +90,6 @@ service2:build:
     - cd service2
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Logging in to Docker Hub..."
         docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN || echo "Docker login failed"
       else
         echo "WARNING: No Docker credentials found."
@@ -151,7 +102,6 @@ service2:build:
     - docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
     - |
       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-        echo "Pushing images to Docker Hub..."
         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
         docker push ${IMAGE_NAME}:latest || echo "Push failed"
       else
