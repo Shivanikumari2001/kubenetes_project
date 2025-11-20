@@ -133,3 +133,4 @@ update-helm-chart:
     - main
     - master
   when: manual
+# Trigger CI/CD
