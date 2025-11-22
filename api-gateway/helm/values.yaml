@@ -134,3 +134,8 @@ ingress:
           pathType: Prefix
   tls: []
 
+autoscaling:
+  enabled: false        # HPA disabled (no scaling)
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
