@@ -1,11 +1,80 @@
+# replicaCount: 1
+
+# image:
+#   # repository: wrakash/sky-gateway
+#   # pullPolicy: IfNotPresent
+#   # tag: "1.0.0"
+#   repository: api-gateway
+#   tag: "latest"
+#   pullPolicy: IfNotPresent
+
+# imagePullSecrets: []
+# nameOverride: ""
+# fullnameOverride: ""
+
+# serviceAccount:
+#   create: true
+#   annotations: {}
+#   name: ""
+
+# podAnnotations: {}
+
+# podSecurityContext: {}
+
+# securityContext: {}
+
+# service:
+#   type: LoadBalancer
+#   port: 3000
+
+# ingress:
+#   enabled: true
+#   className: "nginx"
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+#   hosts:
+#     - host: api-gateway.local
+#       paths:
+#         - path: /
+#           pathType: Prefix
+#   tls: []
+
+# resources:
+#   limits:
+#     cpu: 500m
+#     memory: 512Mi
+#   requests:
+#     cpu: 250m
+#     memory: 256Mi
+
+# autoscaling:
+#   enabled: false
+#   minReplicas: 2
+#   maxReplicas: 5
+#   targetCPUUtilizationPercentage: 80
+
+# nodeSelector: {}
+
+# tolerations: []
+
+# affinity: {}
+
+# env:
+#   - name: PORT
+#     value: "3000"
+#   - name: NODE_ENV
+#     value: "production"
+#   - name: SERVICE1_URL
+#     value: "http://service1:3001"
+#   - name: SERVICE2_URL
+#     value: "http://service2:3002"
+
+
 replicaCount: 1
 
 image:
-  # repository: wrakash/sky-gateway
-  # pullPolicy: IfNotPresent
-  # tag: "1.0.0"
-  repository: api-gateway
-  tag: "latest"
+  repository: shivani0320/api-gateway   # 🔹 Docker Hub का सही नाम
+  tag: "latest"                          # 🔹 या specific tag
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -68,4 +137,3 @@ env:
     value: "http://service1:3001"
   - name: SERVICE2_URL
     value: "http://service2:3002"
-
