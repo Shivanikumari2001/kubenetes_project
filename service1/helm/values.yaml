@@ -1,12 +1,77 @@
+# replicaCount: 1
+
+# image:
+#   # repository: wrakash/sky-service1
+#   # pullPolicy: IfNotPresent
+#   # tag: "1.0.0"
+#   repository: service1
+#   tag: "latest"
+#   pullPolicy: Never
+
+# imagePullSecrets: []
+# nameOverride: ""
+# fullnameOverride: ""
+
+# serviceAccount:
+#   create: true
+#   annotations: {}
+#   name: ""
+
+# podAnnotations: {}
+
+# podSecurityContext: {}
+
+# securityContext: {}
+
+# service:
+#   type: ClusterIP
+#   port: 3001
+
+# ingress:
+#   enabled: false
+#   className: ""
+#   annotations: {}
+#   hosts:
+#     - host: service1.local
+#       paths:
+#         - path: /
+#           pathType: Prefix
+#   tls: []
+
+# resources:
+#   limits:
+#     cpu: 500m
+#     memory: 512Mi
+#   requests:
+#     cpu: 250m
+#     memory: 256Mi
+
+# autoscaling:
+#   enabled: false
+#   minReplicas: 2
+#   maxReplicas: 5
+#   targetCPUUtilizationPercentage: 80
+
+# nodeSelector: {}
+
+# tolerations: []
+
+# affinity: {}
+
+# env:
+#   - name: HTTP_PORT
+#     value: "3001"
+#   - name: TCP_PORT
+#     value: "3003"
+#   - name: NODE_ENV
+#     value: "production"
+
 replicaCount: 1
 
 image:
-  # repository: wrakash/sky-service1
-  # pullPolicy: IfNotPresent
-  # tag: "1.0.0"
-  repository: service1
+  repository: shivani0320/service1   # Correct Docker Hub repo
   tag: "latest"
-  pullPolicy: Never
+  pullPolicy: IfNotPresent          # Never ❌ हटाया
 
 imagePullSecrets: []
 nameOverride: ""
@@ -65,4 +130,3 @@ env:
     value: "3003"
   - name: NODE_ENV
     value: "production"
-
