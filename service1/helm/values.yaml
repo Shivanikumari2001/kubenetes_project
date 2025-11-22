@@ -71,7 +71,7 @@ replicaCount: 1
 image:
   repository: shivani0320/service1   # Correct Docker Hub repo
   tag: "latest"
-  pullPolicy: IfNotPresent          # Never ❌ हटाया
+  pullPolicy: IfNotPresent          
 
 imagePullSecrets: []
 nameOverride: ""

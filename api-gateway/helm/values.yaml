@@ -73,8 +73,8 @@
 replicaCount: 1
 
 image:
-  repository: shivani0320/api-gateway   # 🔹 Docker Hub का सही नाम
-  tag: "latest"                          # 🔹 या specific tag
+  repository: shivani0320/api-gateway  
+  tag: "46d35460"                        
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
