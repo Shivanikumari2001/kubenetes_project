@@ -73,7 +73,7 @@ replicaCount: 1
 
 image:
   repository: sky-gateway
-  tag: "1.0.2"
+  tag: "1.0.0"
   pullPolicy: Always    # Force Kubernetes to use NEW image
 
 imagePullSecrets: []
