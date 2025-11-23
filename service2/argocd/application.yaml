@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Shivanikumari2001/my-devops-project.git
-    targetRevision: HEAD
+    targetRevision: main
     path: service2/helm
     helm:
       valueFiles:
