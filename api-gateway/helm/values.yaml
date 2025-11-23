@@ -72,7 +72,7 @@
 replicaCount: 1
 
 image:
-  repository:  wrakash/sky-gateway
+  repository: sky-gateway
   tag: "final"
   pullPolicy: Never   # Force Kubernetes to use NEW image
 
