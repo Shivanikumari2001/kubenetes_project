@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: wrakash/sky-service2
+  repository: service2
   pullPolicy: Never
-  tag: "1.0.1"
+  tag: "final"
   # repository: service2
   # tag: "latest"
   # pullPolicy: Never
