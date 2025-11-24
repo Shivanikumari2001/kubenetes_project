@@ -19,7 +19,7 @@ export class AppService {
         return res.status(404).json({ message: 'Service not found' });
       }
 
-      // Extract the path after service name
+      //kjkdjk Extract the path after service name
       let path = req.path;
       if (path.startsWith('/api/users')) {
         path = path.replace('/api', '');
@@ -78,7 +78,7 @@ export class AppService {
       return res.status(response.status).json(response.data);
     } catch (error: any) {
       console.error(`Error proxying to ${serviceName}:`, error.message);
-      
+      //hkjhjkhjj
       // Handle different error types
       let statusCode = 500;
       let errorMessage = error.message;
