@@ -1,204 +1,94 @@
-# stages:
-#   - test
-#   - build
-#   - deploy
-
-# variables:
-#   DOCKER_DRIVER: overlay2
-#   DOCKER_TLS_CERTDIR: "/certs"
-
-# # Test all services
-# test:
-#   stage: test
-#   image: node:20-alpine
-#   script:
-#     - cd api-gateway && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
-#     - cd service1 && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
-#     - cd service2 && npm install && npm audit fix --force || true && npm test || echo "No tests or skipped" && cd ..
-#   only:
-#     - main
-#     - master
-#     - develop
-#     - merge_requests
-
-# # Build Docker Images for all services
-# api-gateway-build:
-#   stage: build
-#   image: docker:24-dind
-#   services:
-#     - docker:24-dind
-#   variables:
-#     IMAGE_NAME: wrakash/sky-gateway
-#   before_script:
-#     - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
-#   script:
-#     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-#     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-#     - |
-#       cd api-gateway || exit 1
-#       pwd
-#       ls -la
-#       if [ ! -f "Dockerfile" ]; then
-#         echo "ERROR: Dockerfile not found in api-gateway directory"
-#         exit 1
-#       fi
-#       docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-#       docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-#       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-#         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-#         docker push ${IMAGE_NAME}:latest || echo "Push failed"
-#       else
-#         echo "Skipping push - no credentials available"
-#       fi
-#   only:
-#     - main
-#     - master
-#     - develop
-#     - tags
-
-# service1-build:
-#   stage: build
-#   image: docker:24-dind
-#   services:
-#     - docker:24-dind
-#   variables:
-#     IMAGE_NAME: wrakash/sky-service1
-#   before_script:
-#     - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
-#   script:
-#     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-#     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-#     - |
-#       cd service1 || exit 1
-#       pwd
-#       ls -la
-#       if [ ! -f "Dockerfile" ]; then
-#         echo "ERROR: Dockerfile not found in service1 directory"
-#         exit 1
-#       fi
-#       docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-#       docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-#       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-#         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-#         docker push ${IMAGE_NAME}:latest || echo "Push failed"
-#       else
-#         echo "Skipping push - no credentials available"
-#       fi
-#   only:
-#     - main
-#     - master
-#     - develop
-#     - tags
-
-# service2-build:
-#   stage: build
-#   image: docker:24-dind
-#   services:
-#     - docker:24-dind
-#   variables:
-#     IMAGE_NAME: wrakash/sky-service2
-#   before_script:
-#     - if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin || echo "Docker login failed"; else echo "WARNING: No Docker credentials found."; fi
-#   script:
-#     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-#     - echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-#     - |
-#       cd service2 || exit 1
-#       pwd
-#       ls -la
-#       if [ ! -f "Dockerfile" ]; then
-#         echo "ERROR: Dockerfile not found in service2 directory"
-#         exit 1
-#       fi
-#       docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-#       docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-#       if [ -n "$DOCKER_HUB_USER" ] && [ -n "$DOCKER_HUB_TOKEN" ]; then
-#         docker push ${IMAGE_NAME}:${IMAGE_TAG} || echo "Push failed"
-#         docker push ${IMAGE_NAME}:latest || echo "Push failed"
-#       else
-#         echo "Skipping push - no credentials available"
-#       fi
-#   only:
-#     - main
-#     - master
-#     - develop
-#     - tags
-
-# # Deploy using Helm
-# deploy:
-#   stage: deploy
-#   image: alpine/helm:3.12.0
-#   dependencies:
-#     - api-gateway-build
-#     - service1-build
-#     - service2-build
-#   before_script:
-#     - mkdir -p ~/.kube
-#     - echo "$KUBECONFIG" | base64 -d > ~/.kube/config || echo "KUBECONFIG not set, skipping deployment"
-#   script:
-#     - export IMAGE_TAG=${CI_COMMIT_SHORT_SHA:-latest}
-#     - |
-#       if [ -n "$KUBECONFIG" ]; then
-#         helm upgrade --install api-gateway ./api-gateway/helm \
-#           --namespace default \
-#           --set image.repository=wrakash/sky-gateway \
-#           --set image.tag=$IMAGE_TAG \
-#           --wait \
-#           --timeout 5m || echo "API Gateway deployment failed"
-#         helm upgrade --install service1 ./service1/helm \
-#           --namespace default \
-#           --set image.repository=wrakash/sky-service1 \
-#           --set image.tag=$IMAGE_TAG \
-#           --wait \
-#           --timeout 5m || echo "Service1 deployment failed"
-#         helm upgrade --install service2 ./service2/helm \
-#           --namespace default \
-#           --set image.repository=wrakash/sky-service2 \
-#           --set image.tag=$IMAGE_TAG \
-#           --wait \
-#           --timeout 5m || echo "Service2 deployment failed"
-#       else
-#         echo "KUBECONFIG not set, skipping deployment"
-#       fi
-#   environment:
-#     name: production
-#   when: manual
-#   only:
-#     - main
-#     - master
-
 stages:
+  - test
   - build
+  - deploy
 
 variables:
-  PROJECT_ID: "$GCP_PROJECT_ID"
-  REGION: "asia-south1"
-  REPO: "prod-docker-repo"
-  GCLOUD_SERVICE_KEY: "$GCP_SA_KEY"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
 
-before_script:
-  - echo "$GCLOUD_SERVICE_KEY" > key.json
-  - gcloud auth activate-service-account --key-file=key.json
-  - gcloud config set project $PROJECT_ID
-  - gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
-
-build_api_gateway:
-  stage: build
+# -------------------------
+# TEST JOB
+# -------------------------
+test:
+  stage: test
+  image: node:20-alpine
   script:
-    - gcloud builds submit api-gateway --tag=${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/api-gateway:latest
+    - cd api-gateway && npm install && cd ..
+    - cd service1 && npm install && cd ..
+    - cd service2 && npm install && cd ..
+  only:
+    - main
+    - merge_requests
+
+# -------------------------
+# API GATEWAY BUILD
+# -------------------------
+api-gateway-build:
+  stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-gateway
+  before_script:
+    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+  script:
+    - cd api-gateway
+    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
   only:
     - main
 
-build_service1:
+# -------------------------
+# SERVICE1 BUILD
+# -------------------------
+service1-build:
   stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-service1
+  before_script:
+    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
   script:
-    - gcloud builds submit service1 --tag=${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/service1:latest
+    - cd service1
+    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
   only:
     - main
 
-build_service2:
+# -------------------------
+# SERVICE2 BUILD
+# -------------------------
+service2-build:
   stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    IMAGE_NAME: wrakash/sky-service2
+  before_script:
+    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
   script:
-    - gcloud builds submit service2 --tag=${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/service2:latest
+    - cd service2
+    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  only:
+    - main
+
+# -------------------------
+# DEPLOY JOB (MANUAL)
+# -------------------------
+deploy:
+  stage: deploy
+  image: alpine/helm:3.12.0
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
+  script:
+    - echo "Deployment triggered (but ArgoCD handles actual deployment)"
+  when: manual
   only:
     - main
