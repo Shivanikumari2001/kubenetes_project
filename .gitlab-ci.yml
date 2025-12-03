@@ -21,21 +21,26 @@ test:
     - main
 
 # -------------------------
+# LOGIN TO GOOGLE ARTIFACT REGISTRY
+# -------------------------
+.gcp-login: &gcp-login
+  before_script:
+    - echo "$GCP_SA_KEY" > key.json
+    - gcloud auth activate-service-account --key-file=key.json
+    - gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+# -------------------------
 # API GATEWAY BUILD
 # -------------------------
 api-gateway-build:
   stage: build
-  image: docker:24-dind
-  services:
-    - docker:24-dind
-  variables:
-    IMAGE_NAME: wrakash/sky-gateway
-  before_script:
-    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
+  image:
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  <<: *gcp-login
   script:
     - cd api-gateway
-    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
-    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - docker build -t asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/api-gateway:${CI_COMMIT_SHORT_SHA} .
+    - docker push asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/api-gateway:${CI_COMMIT_SHORT_SHA}
   only:
     - main
 
@@ -44,17 +49,13 @@ api-gateway-build:
 # -------------------------
 service1-build:
   stage: build
-  image: docker:24-dind
-  services:
-    - docker:24-dind
-  variables:
-    IMAGE_NAME: wrakash/sky-service1
-  before_script:
-    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
+  image:
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  <<: *gcp-login
   script:
     - cd service1
-    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
-    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - docker build -t asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1:${CI_COMMIT_SHORT_SHA} .
+    - docker push asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1:${CI_COMMIT_SHORT_SHA}
   only:
     - main
 
@@ -63,31 +64,23 @@ service1-build:
 # -------------------------
 service2-build:
   stage: build
-  image: docker:24-dind
-  services:
-    - docker:24-dind
-  variables:
-    IMAGE_NAME: wrakash/sky-service2
-  before_script:
-    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
+  image:
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  <<: *gcp-login
   script:
     - cd service2
-    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
-    - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+    - docker build -t asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service2:${CI_COMMIT_SHORT_SHA} .
+    - docker push asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service2:${CI_COMMIT_SHORT_SHA}
   only:
     - main
 
 # -------------------------
-# DEPLOY JOB
+# DEPLOY JOB (ARGO CD)
 # -------------------------
 deploy:
   stage: deploy
-  image: alpine/helm:3.12.0
-  before_script:
-    - mkdir -p ~/.kube
-    - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
   script:
-    - echo "ArgoCD handles deployment"
+    - echo "ArgoCD handles deployment, GitLab only triggers image build"
   when: manual
   only:
     - main
