@@ -19,7 +19,6 @@ test:
     - cd service2 && npm install && cd ..
   only:
     - main
-    - merge_requests
 
 # -------------------------
 # API GATEWAY BUILD
@@ -32,7 +31,7 @@ api-gateway-build:
   variables:
     IMAGE_NAME: wrakash/sky-gateway
   before_script:
-    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
   script:
     - cd api-gateway
     - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
@@ -51,7 +50,7 @@ service1-build:
   variables:
     IMAGE_NAME: wrakash/sky-service1
   before_script:
-    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
   script:
     - cd service1
     - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
@@ -70,7 +69,7 @@ service2-build:
   variables:
     IMAGE_NAME: wrakash/sky-service2
   before_script:
-    - echo "$DOCKER_HUB_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+    - docker login -u "$DOCKER_HUB_USER" -p "$DOCKER_HUB_TOKEN"
   script:
     - cd service2
     - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
@@ -79,7 +78,7 @@ service2-build:
     - main
 
 # -------------------------
-# DEPLOY JOB (MANUAL)
+# DEPLOY JOB
 # -------------------------
 deploy:
   stage: deploy
@@ -88,7 +87,7 @@ deploy:
     - mkdir -p ~/.kube
     - echo "$KUBECONFIG" | base64 -d > ~/.kube/config
   script:
-    - echo "Deployment triggered (but ArgoCD handles actual deployment)"
+    - echo "ArgoCD handles deployment"
   when: manual
   only:
     - main
