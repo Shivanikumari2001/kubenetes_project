@@ -1,9 +1,10 @@
 replicaCount: 1
 
 image:
-  repository: service2
+  repository: "asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service2"
+  tag: "v1"
+
   pullPolicy: Never
-  tag: "final"
   # repository: service2
   # tag: "latest"
   # pullPolicy: Never
