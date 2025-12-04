@@ -75,7 +75,7 @@ image:
   repository: "asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/api-gateway"
   tag: "v1"   # MUST MATCH your pushed tag
 
-  pullPolicy: Never   # Force Kubernetes to use NEW image
+  pullPolicy:  Always   # Force Kubernetes to use NEW image
 
 imagePullSecrets: []
 
