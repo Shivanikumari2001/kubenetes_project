@@ -3,13 +3,10 @@ replicaCount: 1
 image:
   repository: "asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service2"
   tag: "v1"
-
-  pullPolicy: Never
-  # repository: service2
-  # tag: "latest"
-  # pullPolicy: Never
+  pullPolicy: Always   # ✅ Never ko Always kar diya
 
 imagePullSecrets: []
+
 nameOverride: "service2"
 fullnameOverride: "service2"
 
@@ -30,14 +27,6 @@ service:
 
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-  hosts:
-    - host: service2.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
 
 resources:
   limits:
@@ -64,4 +53,3 @@ env:
     value: "3002"
   - name: NODE_ENV
     value: "production"
-
