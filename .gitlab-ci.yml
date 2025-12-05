@@ -4,8 +4,11 @@ stages:
   - deploy
 
 variables:
-  DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:24-dind
 
 # -------------------------
 # TEST JOB
@@ -24,8 +27,12 @@ test:
 # GOOGLE CLOUD LOGIN TEMPLATE
 # -------------------------
 .gcp-login: &gcp-login
+  image: docker:24
   before_script:
-    - echo "$GCP_SA_KEY_JSON" > key.json        # MULTILINE JSON → FILE
+    - apk add --no-cache curl python3 py3-pip bash
+    - curl -sSL https://sdk.cloud.google.com | bash
+    - source /root/google-cloud-sdk/path.bash.inc
+    - echo "$GCP_SA_KEY_JSON" > key.json
     - gcloud auth activate-service-account --key-file=key.json
     - gcloud config set project glassy-song-449317-a9
     - gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
@@ -35,8 +42,6 @@ test:
 # -------------------------
 api-gateway-build:
   stage: build
-  image:
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   <<: *gcp-login
   script:
     - cd api-gateway
@@ -50,8 +55,6 @@ api-gateway-build:
 # -------------------------
 service1-build:
   stage: build
-  image:
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   <<: *gcp-login
   script:
     - cd service1
@@ -65,8 +68,6 @@ service1-build:
 # -------------------------
 service2-build:
   stage: build
-  image:
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   <<: *gcp-login
   script:
     - cd service2
@@ -76,12 +77,13 @@ service2-build:
     - main
 
 # -------------------------
-# DEPLOY (ArgoCD triggers)
+# DEPLOY (ARGOCD TRIGGER)
 # -------------------------
 deploy:
   stage: deploy
   script:
-    - echo "ArgoCD handles deployment, GitLab only triggers build"
+    - echo "Images pushed to GAR ✅"
+    - echo "ArgoCD will auto sync ✅"
   when: manual
   only:
     - main
