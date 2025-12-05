@@ -1,7 +1,9 @@
 replicaCount: 1
 image:
-  image: asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1:latest
+  image:
+  image: asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1:v1
   pullPolicy: Always
+
 
 imagePullSecrets: []
 
