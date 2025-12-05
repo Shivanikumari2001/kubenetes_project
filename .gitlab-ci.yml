@@ -27,11 +27,10 @@ test:
 # GOOGLE CLOUD LOGIN TEMPLATE
 # -------------------------
 .gcp-login: &gcp-login
-  image: docker:24
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   before_script:
-    - apk add --no-cache curl python3 py3-pip bash
-    - curl -sSL https://sdk.cloud.google.com | bash
-    - source /root/google-cloud-sdk/path.bash.inc
+    - apt-get update
+    - apt-get install -y docker.io
     - echo "$GCP_SA_KEY_JSON" > key.json
     - gcloud auth activate-service-account --key-file=key.json
     - gcloud config set project glassy-song-449317-a9
@@ -77,7 +76,7 @@ service2-build:
     - main
 
 # -------------------------
-# DEPLOY (ARGOCD TRIGGER)
+# DEPLOY
 # -------------------------
 deploy:
   stage: deploy
