@@ -2,9 +2,8 @@ replicaCount: 1
 
 image:
   repository: "asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/api-gateway"
-  tag: "v1"   # MUST MATCH your pushed tag
-
-  pullPolicy:  Always   # Force Kubernetes to use NEW image
+  tag: "v1"
+  pullPolicy: Always
 
 imagePullSecrets: []
 
@@ -37,6 +36,7 @@ livenessProbe:
   initialDelaySeconds: 40
   periodSeconds: 10
   timeoutSeconds: 5
+
 readinessProbe:
   httpGet:
     path: /
@@ -44,6 +44,7 @@ readinessProbe:
   initialDelaySeconds: 30
   periodSeconds: 5
   timeoutSeconds: 5 
+
 resources:
   requests:
     cpu: "250m"
@@ -52,20 +53,21 @@ resources:
     cpu: "500m"
     memory: "512Mi"
 
+# ✅ ✅ UPDATED INGRESS SECTION (IP BASED - NO HOST)
+
 ingress:
   enabled: true
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   hosts:
-    - host: api-gateway.local
-      paths:
+    - paths:
         - path: /
           pathType: Prefix
   tls: []
 
 autoscaling:
-  enabled: false        # HPA disabled (no scaling)
+  enabled: false
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
