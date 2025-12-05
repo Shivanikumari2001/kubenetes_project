@@ -3,8 +3,7 @@ replicaCount: 1
 image:
   repository: "asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service2"
   tag: "v1"
-  pullPolicy: Always
-   # ✅ Never ko Always kar diya
+  pullPolicy: Always   # ✅ FINAL FIX
 
 imagePullSecrets: []
 
@@ -39,8 +38,8 @@ resources:
 
 autoscaling:
   enabled: false
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 80
 
 nodeSelector: {}
