@@ -1,9 +1,9 @@
 replicaCount: 1
-
 image:
   repository: asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1
-  tag: "@sha256:6dfc46cf4a23805c348dae391327fe1ec1f9eb4e50bde85987c74f5946d4539b"
+  tag: "latest"
   pullPolicy: Always
+
 
 imagePullSecrets: []
 
