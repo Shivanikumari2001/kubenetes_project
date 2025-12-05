@@ -1,9 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1
-  # ✅ Latest confirmed digest from your GAR
-  tag: "@sha256:6dfc46cf4a23805c348dae391327fe1ec1f9eb4e50bde85987c74f5946d4539b"
+  # ✅ CORRECT GAR IMAGE WITH DIGEST (NO tag:)
+  repository: asia-south1-docker.pkg.dev/glassy-song-449317-a9/prod-docker-repo/service1@sha256:6dfc46cf4a23805c348dae391327fe1ec1f9eb4e50bde85987c74f5946d4539b
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -28,7 +27,7 @@ env:
   - name: NODE_ENV
     value: "production"
 
-# ✅ CPU/MEM LOW rakha gaya taaki Pending dobara na aaye
+# ✅ LOW CPU/MEM taaki Pending / Insufficient CPU na aaye
 resources:
   requests:
     cpu: "100m"
