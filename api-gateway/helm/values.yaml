@@ -53,18 +53,23 @@ resources:
     cpu: "500m"
     memory: "512Mi"
 
-# ✅ ✅ UPDATED INGRESS SECTION (IP BASED - NO HOST)
+# ✅ ✅ ✅ DOMAIN + SSL ENABLED INGRESS (PRODUCTION READY)
 
 ingress:
   enabled: true
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod   # ✅ SSL enable
   hosts:
-    - paths:
+    - host: central-server.variphi.com                  # ✅ DOMAIN
+      paths:
         - path: /
           pathType: Prefix
-  tls: []
+  tls:
+    - hosts:
+        - central-server.variphi.com
+      secretName: central-server-tls                   # ✅ SSL secret
 
 autoscaling:
   enabled: false
